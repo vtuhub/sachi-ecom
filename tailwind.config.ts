@@ -52,6 +52,19 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// Sachi Brand Colors
+				sage: {
+					DEFAULT: 'hsl(var(--sage))',
+					foreground: 'hsl(var(--sage-foreground))'
+				},
+				'warm-beige': {
+					DEFAULT: 'hsl(var(--warm-beige))',
+					foreground: 'hsl(var(--warm-beige-foreground))'
+				},
+				charcoal: {
+					DEFAULT: 'hsl(var(--charcoal))',
+					foreground: 'hsl(var(--charcoal-foreground))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
