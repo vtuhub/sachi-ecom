@@ -1,9 +1,18 @@
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, Search, User, Menu } from "lucide-react";
+import { ShoppingBag, Search, User, Menu, LogOut } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { Link } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-export default function Header() {
+export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
@@ -37,9 +46,33 @@ export default function Header() {
             <Button variant="ghost" size="icon" className="hidden sm:inline-flex">
               <Search className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="hidden sm:inline-flex">
-              <User className="h-4 w-4" />
-            </Button>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="hidden sm:inline-flex">
+                    <User className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile">My Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/orders">My Orders</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={signOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button variant="ghost" size="icon" className="hidden sm:inline-flex" asChild>
+                <Link to="/auth">
+                  <User className="h-4 w-4" />
+                </Link>
+              </Button>
+            )}
             <Button variant="ghost" size="icon" className="relative">
               <ShoppingBag className="h-4 w-4" />
               <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground rounded-full text-xs w-5 h-5 flex items-center justify-center">
@@ -77,9 +110,33 @@ export default function Header() {
                 <Button variant="ghost" size="icon">
                   <Search className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon">
-                  <User className="h-4 w-4" />
-                </Button>
+                {user ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <User className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem asChild>
+                        <Link to="/profile">My Profile</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/orders">My Orders</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={signOut}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Sign Out
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Button variant="ghost" size="icon" asChild>
+                    <Link to="/auth">
+                      <User className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                )}
               </div>
             </nav>
           </div>
@@ -87,4 +144,4 @@ export default function Header() {
       </div>
     </header>
   );
-}
+};
