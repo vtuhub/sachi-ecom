@@ -7,6 +7,9 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
+import Orders from "./pages/Orders";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 import { useAuth } from "./hooks/useAuth";
 
 const queryClient = new QueryClient();
@@ -30,6 +33,9 @@ const AppContent = () => {
         element={user ? <Navigate to="/" replace /> : <Auth />} 
       />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/orders" element={<Orders />} />
+      <Route path="/cart" element={<Cart />} />
+      <Route path="/checkout" element={<Checkout />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>

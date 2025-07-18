@@ -2,6 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, ShoppingBag } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface ProductCardProps {
   id: string;
@@ -30,6 +34,53 @@ export default function ProductCard({
 }: ProductCardProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const addToCart = async () => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to add items to your cart.",
+      });
+      navigate("/auth");
+      return;
+    }
+
+    setIsAddingToCart(true);
+    try {
+      const { error } = await supabase
+        .from("cart_items")
+        .upsert({
+          user_id: user.id,
+          product_name: name,
+          product_description: `${category} - ${name}`,
+          quantity: 1,
+          unit_price: Math.round(price * 100), // Convert to cents
+        }, {
+          onConflict: 'user_id,product_name',
+          ignoreDuplicates: false,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Added to cart",
+        description: `${name} has been added to your cart.`,
+      });
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add item to cart. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
 
   return (
     <div
@@ -81,9 +132,14 @@ export default function ProductCard({
             isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}
         >
-          <Button className="w-full" variant="sage">
+          <Button 
+            className="w-full" 
+            variant="sage"
+            onClick={addToCart}
+            disabled={isAddingToCart}
+          >
             <ShoppingBag className="h-4 w-4 mr-2" />
-            Add to Cart
+            {isAddingToCart ? "Adding..." : "Add to Cart"}
           </Button>
         </div>
       </div>
