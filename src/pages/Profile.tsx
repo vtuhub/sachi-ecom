@@ -10,6 +10,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Navigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Avatar } from "@/components/ui/avatar";
+import { LogOut } from "lucide-react";
 
 interface ProfileData {
   first_name: string;
@@ -30,7 +32,7 @@ interface ProfileData {
 }
 
 const Profile = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [profile, setProfile] = useState<ProfileData>({
@@ -132,8 +134,8 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Card className="w-full max-w-md animate-pulse h-96 bg-muted/50" />
       </div>
     );
   }
@@ -145,183 +147,71 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground">My Profile</h1>
-            <p className="text-muted-foreground mt-2">
-              Manage your personal information and addresses
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Personal Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Personal Information</CardTitle>
-                <CardDescription>
-                  Update your personal details and contact information
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="first_name">First Name</Label>
-                    <Input
-                      id="first_name"
-                      value={profile.first_name}
-                      onChange={(e) => handleInputChange("first_name", e.target.value)}
-                      placeholder="Enter your first name"
-                    />
+      <main className="container mx-auto px-4 py-8 flex flex-col items-center">
+        <Card className="w-full max-w-2xl p-0 overflow-hidden">
+          <CardContent className="p-8 flex flex-col gap-6">
+            <div className="flex flex-col items-center gap-2 mb-4">
+              <Avatar className="w-20 h-20 text-2xl font-bold bg-muted text-primary-foreground">
+                {user.user_metadata?.first_name?.[0] || user.email?.[0] || "U"}
+              </Avatar>
+              <h1 className="text-2xl font-bold text-foreground">My Profile</h1>
+              <span className="text-muted-foreground text-sm">{user.email}</span>
+            </div>
+            <Separator />
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="first_name">First Name</Label>
+                <Input id="first_name" value={profile.first_name} onChange={e => handleInputChange('first_name', e.target.value)} required className="mb-2" />
+              </div>
+              <div>
+                <Label htmlFor="last_name">Last Name</Label>
+                <Input id="last_name" value={profile.last_name} onChange={e => handleInputChange('last_name', e.target.value)} required className="mb-2" />
+              </div>
+              <div>
+                <Label htmlFor="phone">Phone</Label>
+                <Input id="phone" value={profile.phone} onChange={e => handleInputChange('phone', e.target.value)} className="mb-2" />
+              </div>
+              <div className="md:col-span-2 flex justify-end">
+                <Button type="submit" variant="sage" size="lg" className="w-full md:w-auto" disabled={isLoading} aria-label="Save profile">
+                  {isLoading ? "Saving..." : "Save Profile"}
+                </Button>
+              </div>
+            </form>
+            <Separator />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="bg-muted/50">
+                <CardContent className="p-4">
+                  <h2 className="font-semibold mb-2 text-foreground">Shipping Address</h2>
+                  <div className="text-sm text-muted-foreground">
+                    {profile.shipping_address_line1 && <div>{profile.shipping_address_line1}</div>}
+                    {profile.shipping_address_line2 && <div>{profile.shipping_address_line2}</div>}
+                    {profile.shipping_city && <div>{profile.shipping_city}, {profile.shipping_state} {profile.shipping_postal_code}</div>}
+                    {profile.shipping_country && <div>{profile.shipping_country}</div>}
+                    {!profile.shipping_address_line1 && <div className="italic">No shipping address saved.</div>}
                   </div>
-                  <div>
-                    <Label htmlFor="last_name">Last Name</Label>
-                    <Input
-                      id="last_name"
-                      value={profile.last_name}
-                      onChange={(e) => handleInputChange("last_name", e.target.value)}
-                      placeholder="Enter your last name"
-                    />
+                </CardContent>
+              </Card>
+              <Card className="bg-muted/50">
+                <CardContent className="p-4">
+                  <h2 className="font-semibold mb-2 text-foreground">Billing Address</h2>
+                  <div className="text-sm text-muted-foreground">
+                    {profile.billing_address_line1 && <div>{profile.billing_address_line1}</div>}
+                    {profile.billing_address_line2 && <div>{profile.billing_address_line2}</div>}
+                    {profile.billing_city && <div>{profile.billing_city}, {profile.billing_state} {profile.billing_postal_code}</div>}
+                    {profile.billing_country && <div>{profile.billing_country}</div>}
+                    {!profile.billing_address_line1 && <div className="italic">No billing address saved.</div>}
                   </div>
-                </div>
-                <div>
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={profile.phone}
-                    onChange={(e) => handleInputChange("phone", e.target.value)}
-                    placeholder="Enter your phone number"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Shipping Address */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Shipping Address</CardTitle>
-                <CardDescription>
-                  Your default shipping address for orders
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="shipping_address_line1">Address Line 1</Label>
-                  <Input
-                    id="shipping_address_line1"
-                    value={profile.shipping_address_line1}
-                    onChange={(e) => handleInputChange("shipping_address_line1", e.target.value)}
-                    placeholder="Street address"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="shipping_address_line2">Address Line 2 (Optional)</Label>
-                  <Input
-                    id="shipping_address_line2"
-                    value={profile.shipping_address_line2}
-                    onChange={(e) => handleInputChange("shipping_address_line2", e.target.value)}
-                    placeholder="Apartment, suite, etc."
-                  />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="shipping_city">City</Label>
-                    <Input
-                      id="shipping_city"
-                      value={profile.shipping_city}
-                      onChange={(e) => handleInputChange("shipping_city", e.target.value)}
-                      placeholder="City"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="shipping_state">State</Label>
-                    <Input
-                      id="shipping_state"
-                      value={profile.shipping_state}
-                      onChange={(e) => handleInputChange("shipping_state", e.target.value)}
-                      placeholder="State"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="shipping_postal_code">ZIP Code</Label>
-                    <Input
-                      id="shipping_postal_code"
-                      value={profile.shipping_postal_code}
-                      onChange={(e) => handleInputChange("shipping_postal_code", e.target.value)}
-                      placeholder="ZIP code"
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Billing Address */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Billing Address</CardTitle>
-                <CardDescription>
-                  Your billing address for payment processing
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="billing_address_line1">Address Line 1</Label>
-                  <Input
-                    id="billing_address_line1"
-                    value={profile.billing_address_line1}
-                    onChange={(e) => handleInputChange("billing_address_line1", e.target.value)}
-                    placeholder="Street address"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="billing_address_line2">Address Line 2 (Optional)</Label>
-                  <Input
-                    id="billing_address_line2"
-                    value={profile.billing_address_line2}
-                    onChange={(e) => handleInputChange("billing_address_line2", e.target.value)}
-                    placeholder="Apartment, suite, etc."
-                  />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="billing_city">City</Label>
-                    <Input
-                      id="billing_city"
-                      value={profile.billing_city}
-                      onChange={(e) => handleInputChange("billing_city", e.target.value)}
-                      placeholder="City"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="billing_state">State</Label>
-                    <Input
-                      id="billing_state"
-                      value={profile.billing_state}
-                      onChange={(e) => handleInputChange("billing_state", e.target.value)}
-                      placeholder="State"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="billing_postal_code">ZIP Code</Label>
-                    <Input
-                      id="billing_postal_code"
-                      value={profile.billing_postal_code}
-                      onChange={(e) => handleInputChange("billing_postal_code", e.target.value)}
-                      placeholder="ZIP code"
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
+                </CardContent>
+              </Card>
+            </div>
+            <Separator />
             <div className="flex justify-end">
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save Changes"}
+              <Button type="button" variant="destructive" size="lg" onClick={signOut} aria-label="Sign out">
+                <LogOut className="h-5 w-5 mr-2" />Sign Out
               </Button>
             </div>
-          </form>
-        </div>
+          </CardContent>
+        </Card>
       </main>
       <Footer />
     </div>

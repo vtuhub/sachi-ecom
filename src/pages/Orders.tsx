@@ -6,10 +6,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Package, Clock, Truck, CheckCircle, XCircle } from "lucide-react";
+import productSweater from "@/assets/product-sweater.jpg";
+import productTee from "@/assets/product-tee.jpg";
+import productBlazer from "@/assets/product-blazer.jpg";
+
+const productImages: Record<string, string> = {
+  "Minimalist Wool Sweater": productSweater,
+  "Organic Cotton Tee": productTee,
+  "Tailored Linen Blazer": productBlazer,
+  "Wide-Leg Trousers": productSweater,
+  "Cashmere Scarf": productTee,
+  "Silk Midi Dress": productBlazer,
+};
 
 interface OrderItem {
   id: string;
@@ -122,8 +134,12 @@ const Orders = () => {
 
   if (loading || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mx-auto p-8">
+          {[...Array(2)].map((_, i) => (
+            <Card key={i} className="animate-pulse h-40 bg-muted/50" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -132,99 +148,56 @@ const Orders = () => {
     return <Navigate to="/auth" replace />;
   }
 
+  if (orders.length === 0) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
+        <img src={productSweater} alt="No orders" className="w-32 h-32 mb-6 opacity-60" />
+        <h2 className="text-2xl font-bold mb-2 text-foreground">No orders yet</h2>
+        <p className="text-muted-foreground mb-6">You haven't placed any orders yet.</p>
+        <Button asChild variant="sage" size="lg">
+          <Link to="/">Shop Now</Link>
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground">My Orders</h1>
-            <p className="text-muted-foreground mt-2">
-              Track your orders and view your purchase history
-            </p>
-          </div>
-
-          {orders.length === 0 ? (
-            <Card className="text-center py-12">
-              <CardContent>
-                <Package className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-xl font-semibold mb-2">No orders yet</h3>
-                <p className="text-muted-foreground mb-4">
-                  When you place your first order, it will appear here.
-                </p>
-                <Button onClick={() => window.location.href = "/"}>
-                  Continue Shopping
-                </Button>
+        <h1 className="text-2xl font-bold mb-8 text-foreground">My Orders</h1>
+        <div className="flex flex-col gap-8">
+          {orders.map((order) => (
+            <Card key={order.id} className="p-0 overflow-hidden">
+              <CardContent className="p-6">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
+                  <div className="flex flex-col md:flex-row md:items-center gap-2">
+                    <span className="font-semibold text-lg text-foreground">Order #{order.order_number}</span>
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(order.status)}`}>{order.status}</span>
+                  </div>
+                  <span className="text-sm text-muted-foreground">{formatDate(order.created_at)}</span>
+                </div>
+                <Separator className="mb-4" />
+                <div className="flex flex-col gap-4">
+                  {order.order_items.map((item) => (
+                    <div key={item.id} className="flex items-center gap-4">
+                      <img src={productImages[item.product_name] || productSweater} alt={item.product_name} className="w-16 h-20 object-cover rounded border" />
+                      <div className="flex-1">
+                        <div className="font-medium text-foreground line-clamp-1">{item.product_name}</div>
+                        <div className="text-xs text-muted-foreground">Qty: {item.quantity}</div>
+                      </div>
+                      <div className="font-semibold text-foreground">{formatPrice(item.total_price)}</div>
+                    </div>
+                  ))}
+                </div>
+                <Separator className="my-4" />
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Total</span>
+                  <span className="font-bold text-lg text-foreground">{formatPrice(order.total_amount)}</span>
+                </div>
               </CardContent>
             </Card>
-          ) : (
-            <div className="space-y-6">
-              {orders.map((order) => (
-                <Card key={order.id} className="overflow-hidden">
-                  <CardHeader className="bg-muted/50">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="text-lg">
-                          Order #{order.order_number}
-                        </CardTitle>
-                        <CardDescription>
-                          Placed on {formatDate(order.created_at)}
-                        </CardDescription>
-                      </div>
-                      <Badge className={getStatusColor(order.status)}>
-                        <div className="flex items-center gap-1">
-                          {getStatusIcon(order.status)}
-                          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                        </div>
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-6">
-                    <div className="space-y-4">
-                      {order.order_items.map((item) => (
-                        <div key={item.id} className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-medium">{item.product_name}</h4>
-                            <p className="text-sm text-muted-foreground">
-                              {item.product_description}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              Quantity: {item.quantity}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium">
-                              {formatPrice(item.total_price)}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {formatPrice(item.unit_price)} each
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                      
-                      <Separator />
-                      
-                      <div className="flex items-center justify-between pt-2">
-                        <div className="text-sm text-muted-foreground">
-                          {order.shipping_address_line1 && (
-                            <p>
-                              Shipping to: {order.shipping_address_line1}, {order.shipping_city}, {order.shipping_state}
-                            </p>
-                          )}
-                        </div>
-                        <div className="text-right">
-                          <p className="text-lg font-bold">
-                            Total: {formatPrice(order.total_amount)}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+          ))}
         </div>
       </main>
       <Footer />

@@ -10,7 +10,9 @@ import Profile from "./pages/Profile";
 import Orders from "./pages/Orders";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import ProductDetail from "./pages/ProductDetail";
 import { useAuth } from "./hooks/useAuth";
+import { WishlistProvider } from "@/hooks/useWishlist";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +38,7 @@ const AppContent = () => {
       <Route path="/orders" element={<Orders />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/checkout" element={<Checkout />} />
+      <Route path="/product/:id" element={<ProductDetail />} />
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       <Route path="*" element={<NotFound />} />
     </Routes>
@@ -48,7 +51,9 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AppContent />
+        <WishlistProvider>
+          <AppContent />
+        </WishlistProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

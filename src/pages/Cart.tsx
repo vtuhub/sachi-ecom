@@ -2,13 +2,27 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ShoppingCart, Plus, Minus, Trash2 } from "lucide-react";
+import productSweater from "@/assets/product-sweater.jpg";
+import productTee from "@/assets/product-tee.jpg";
+import productBlazer from "@/assets/product-blazer.jpg";
+
+const productImages: Record<string, string> = {
+  "Minimalist Wool Sweater": productSweater,
+  "Organic Cotton Tee": productTee,
+  "Tailored Linen Blazer": productBlazer,
+  "Wide-Leg Trousers": productSweater,
+  "Cashmere Scarf": productTee,
+  "Silk Midi Dress": productBlazer,
+};
 
 interface CartItem {
   id: string;
@@ -136,8 +150,13 @@ const Cart = () => {
 
   if (loading || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl mx-auto p-8">
+          {[...Array(2)].map((_, i) => (
+            <Card key={i} className="animate-pulse h-40 bg-muted/50" />
+          ))}
+          <div className="md:col-span-1 animate-pulse h-40 bg-muted/50 rounded-lg" />
+        </div>
       </div>
     );
   }
@@ -146,146 +165,101 @@ const Cart = () => {
     return <Navigate to="/auth" replace />;
   }
 
+  if (cartItems.length === 0) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
+        <img src={productSweater} alt="Empty cart" className="w-32 h-32 mb-6 opacity-60" />
+        <h2 className="text-2xl font-bold mb-2 text-foreground">Your cart is empty</h2>
+        <p className="text-muted-foreground mb-6">Looks like you haven't added anything yet.</p>
+        <Button asChild variant="sage" size="lg">
+          <Link to="/">Continue Shopping</Link>
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground">Shopping Cart</h1>
-            <p className="text-muted-foreground mt-2">
-              Review your items and proceed to checkout
-            </p>
-          </div>
-
-          {cartItems.length === 0 ? (
-            <Card className="text-center py-12">
-              <CardContent>
-                <ShoppingCart className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-xl font-semibold mb-2">Your cart is empty</h3>
-                <p className="text-muted-foreground mb-4">
-                  Add some items to your cart to get started.
-                </p>
-                <Button onClick={() => navigate("/")}>
-                  Continue Shopping
-                </Button>
+      <main className="container mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Cart Items */}
+        <section className="md:col-span-2 flex flex-col gap-6">
+          <h1 className="text-2xl font-bold mb-2 text-foreground">Shopping Cart</h1>
+          {cartItems.map((item) => (
+            <Card key={item.id} className="flex flex-col md:flex-row items-center gap-4 p-4">
+              <img
+                src={productImages[item.product_name] || productSweater}
+                alt={item.product_name}
+                className="w-24 h-32 object-cover rounded-md border"
+              />
+              <CardContent className="flex-1 flex flex-col gap-2 p-0">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                  <div>
+                    <h2 className="font-semibold text-lg text-foreground">{item.product_name}</h2>
+                    <p className="text-sm text-muted-foreground">{item.product_description}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeItem(item.id)}
+                    aria-label="Remove from cart"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </Button>
+                </div>
+                <div className="flex items-center gap-4 mt-2">
+                  <span className="text-sm text-muted-foreground">Qty:</span>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                    disabled={item.quantity <= 1 || isUpdating}
+                    aria-label="Decrease quantity"
+                  >
+                    <Minus className="h-4 w-4" />
+                  </Button>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={10}
+                    value={item.quantity}
+                    onChange={e => updateQuantity(item.id, Math.max(1, Math.min(10, Number(e.target.value))))}
+                    className="w-14 text-center"
+                    aria-label="Quantity"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                    disabled={isUpdating}
+                    aria-label="Increase quantity"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="mt-2 text-lg font-semibold text-foreground">{formatPrice(item.unit_price * item.quantity)}</div>
               </CardContent>
             </Card>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Cart Items ({cartItems.length})</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {cartItems.map((item) => (
-                      <div key={item.id} className="flex items-center gap-4 p-4 border rounded-lg">
-                        <div className="flex-1">
-                          <h4 className="font-medium">{item.product_name}</h4>
-                          <p className="text-sm text-muted-foreground">
-                            {item.product_description}
-                          </p>
-                          <p className="text-sm font-medium mt-1">
-                            {formatPrice(item.unit_price)} each
-                          </p>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            disabled={isUpdating || item.quantity <= 1}
-                          >
-                            <Minus className="h-4 w-4" />
-                          </Button>
-                          <Input
-                            type="number"
-                            value={item.quantity}
-                            onChange={(e) => {
-                              const newQuantity = parseInt(e.target.value) || 1;
-                              if (newQuantity > 0) {
-                                updateQuantity(item.id, newQuantity);
-                              }
-                            }}
-                            className="w-16 text-center"
-                            min="1"
-                          />
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            disabled={isUpdating}
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        
-                        <div className="text-right">
-                          <p className="font-medium">
-                            {formatPrice(item.unit_price * item.quantity)}
-                          </p>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeItem(item.id)}
-                            disabled={isUpdating}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              </div>
-
-              <div className="lg:col-span-1">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Order Summary</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex justify-between">
-                      <span>Subtotal</span>
-                      <span>{formatPrice(getTotalPrice())}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Shipping</span>
-                      <span>FREE</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Tax</span>
-                      <span>Calculated at checkout</span>
-                    </div>
-                    <div className="border-t pt-4">
-                      <div className="flex justify-between font-bold text-lg">
-                        <span>Total</span>
-                        <span>{formatPrice(getTotalPrice())}</span>
-                      </div>
-                    </div>
-                    <Button 
-                      className="w-full" 
-                      onClick={proceedToCheckout}
-                      disabled={cartItems.length === 0}
-                    >
-                      Proceed to Checkout
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full"
-                      onClick={() => navigate("/")}
-                    >
-                      Continue Shopping
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          )}
-        </div>
+          ))}
+        </section>
+        {/* Order Summary */}
+        <aside className="md:col-span-1 sticky top-24 self-start bg-card rounded-lg shadow-md p-6 flex flex-col gap-4 h-fit">
+          <h2 className="text-xl font-bold mb-2 text-foreground">Order Summary</h2>
+          <Separator />
+          <div className="flex items-center justify-between text-base">
+            <span>Subtotal</span>
+            <span className="font-semibold">{formatPrice(getTotalPrice())}</span>
+          </div>
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <span>Shipping</span>
+            <span>Calculated at checkout</span>
+          </div>
+          <Separator />
+          <Button variant="sage" size="lg" className="w-full" onClick={proceedToCheckout} aria-label="Proceed to checkout">Checkout</Button>
+          <Button asChild variant="ghost" size="sm" className="w-full mt-2" aria-label="Continue shopping">
+            <Link to="/">Continue Shopping</Link>
+          </Button>
+        </aside>
       </main>
       <Footer />
     </div>
