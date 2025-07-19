@@ -305,7 +305,7 @@ const Checkout = () => {
                   <Input id="country" value={shippingAddress.country} onChange={e => handleAddressChange('country', e.target.value)} required className="mb-2" />
                 </div>
               </form>
-              <Button variant="sage" size="lg" className="w-full mt-4" disabled>Continue to Payment (Demo)</Button>
+              <Button variant="sage" size="lg" className="w-full mt-4" onClick={handleSubmit}>Place Order (Demo)</Button>
               <div className="flex items-center gap-2 mt-4">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png" alt="Visa" className="h-6" />
                 <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png" alt="Mastercard" className="h-6" />
@@ -341,7 +341,7 @@ const Checkout = () => {
             <span>Calculated at checkout</span>
           </div>
           <Separator />
-          <Button variant="sage" size="lg" className="w-full" disabled>Checkout (Demo)</Button>
+          <Button variant="sage" size="lg" className="w-full" onClick={handleSubmit}>Place Order (Demo)</Button>
           <Button asChild variant="ghost" size="sm" className="w-full mt-2" aria-label="Continue shopping">
             <Link to="/">Continue Shopping</Link>
           </Button>

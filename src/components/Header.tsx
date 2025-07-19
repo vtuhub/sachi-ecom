@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, Search, User, Menu, LogOut } from "lucide-react";
+import { ShoppingBag, Search, User, Menu, LogOut, Heart } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
@@ -75,6 +75,9 @@ export const Header = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/orders">My Orders</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/wishlist">My Wishlist</Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={signOut} aria-label="Sign out">
                   <LogOut className="mr-2 h-4 w-4" />Sign Out
                 </DropdownMenuItem>
@@ -87,6 +90,11 @@ export const Header = () => {
               </Link>
             </Button>
           )}
+          <Button variant="ghost" size="icon" asChild aria-label="Wishlist">
+            <Link to="/wishlist">
+              <Heart className="h-4 w-4" />
+            </Link>
+          </Button>
           <Button variant="ghost" size="icon" className="relative" asChild aria-label="Cart">
             <Link to="/cart">
               <ShoppingBag className="h-4 w-4" />
@@ -144,6 +152,11 @@ export const Header = () => {
                   </Link>
                 </Button>
               )}
+              <Button variant="outline" size="sm" className="w-full justify-start" asChild aria-label="Wishlist">
+                <Link to="/wishlist">
+                  <Heart className="h-4 w-4 mr-2" />Wishlist
+                </Link>
+              </Button>
               <Button variant="outline" size="sm" className="w-full justify-start" asChild aria-label="Cart">
                 <Link to="/cart">
                   <ShoppingBag className="h-4 w-4 mr-2" />Cart
