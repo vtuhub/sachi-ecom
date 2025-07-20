@@ -72,7 +72,7 @@ export default function ProductCard({
           product_name: name,
           product_description: `${category} - ${name}`,
           quantity: 1,
-          unit_price: Math.round(price * 100), // Convert to cents
+          unit_price: Math.round(price * 100), // Price already in paise (INR cents)
         }, {
           onConflict: 'user_id,product_name',
           ignoreDuplicates: false,
@@ -196,9 +196,9 @@ export default function ProductCard({
         {/* Price */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-lg font-semibold text-foreground">${price.toFixed(2)}</span>
+            <span className="text-lg font-semibold text-foreground">₹{price.toLocaleString('en-IN')}</span>
             {originalPrice && (
-              <span className="text-sm text-muted-foreground line-through">${originalPrice.toFixed(2)}</span>
+              <span className="text-sm text-muted-foreground line-through">₹{originalPrice.toLocaleString('en-IN')}</span>
             )}
           </div>
           {isOnSale && originalPrice && (

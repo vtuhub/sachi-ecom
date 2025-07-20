@@ -56,7 +56,7 @@ const Checkout = () => {
     city: "",
     state: "",
     postal_code: "",
-    country: "US",
+    country: "IN",
   });
   const [notes, setNotes] = useState("");
 
@@ -106,7 +106,7 @@ const Checkout = () => {
           city: data.shipping_city || "",
           state: data.shipping_state || "",
           postal_code: data.shipping_postal_code || "",
-          country: data.shipping_country || "US",
+          country: data.shipping_country || "IN",
         });
       }
     } catch (error) {
@@ -119,9 +119,9 @@ const Checkout = () => {
   };
 
   const formatPrice = (priceInCents: number) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-IN", {
       style: "currency",
-      currency: "USD",
+      currency: "INR",
     }).format(priceInCents / 100);
   };
 

@@ -8,13 +8,13 @@ import productSweater from "@/assets/product-sweater.jpg";
 import productTee from "@/assets/product-tee.jpg";
 import productBlazer from "@/assets/product-blazer.jpg";
 
-// Demo products with generated images
+// Demo products with India pricing (in INR)
 const demoProducts = [
   {
     id: "1",
     name: "Minimalist Wool Sweater",
-    price: 89.99,
-    originalPrice: 129.99,
+    price: 7199,
+    originalPrice: 10399,
     image: productSweater,
     category: "Knitwear",
     isNew: true,
@@ -25,7 +25,7 @@ const demoProducts = [
   {
     id: "2",
     name: "Organic Cotton Tee",
-    price: 39.99,
+    price: 3199,
     image: productTee,
     category: "Basics",
     isNew: false,
@@ -35,7 +35,7 @@ const demoProducts = [
   {
     id: "3",
     name: "Tailored Linen Blazer",
-    price: 149.99,
+    price: 11999,
     image: productBlazer,
     category: "Outerwear",
     isNew: true,
@@ -45,8 +45,8 @@ const demoProducts = [
   {
     id: "4",
     name: "Wide-Leg Trousers",
-    price: 79.99,
-    originalPrice: 99.99,
+    price: 6399,
+    originalPrice: 7999,
     image: productSweater, // Reusing for demo
     category: "Bottoms",
     isOnSale: true,
@@ -56,7 +56,7 @@ const demoProducts = [
   {
     id: "5",
     name: "Cashmere Scarf",
-    price: 59.99,
+    price: 4799,
     image: productTee, // Reusing for demo
     category: "Accessories",
     colors: ["#f5f5f5", "#7c8471", "#d4c4a0"],
@@ -65,7 +65,7 @@ const demoProducts = [
   {
     id: "6",
     name: "Silk Midi Dress",
-    price: 169.99,
+    price: 13599,
     image: productBlazer, // Reusing for demo
     category: "Dresses",
     isNew: true,
@@ -84,7 +84,7 @@ const allSizes = Array.from(new Set(demoProducts.flatMap((p) => p.sizes || [])))
 export default function ProductGrid() {
   const [category, setCategory] = useState("All");
   const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(200);
+  const [maxPrice, setMaxPrice] = useState(20000);
   const [color, setColor] = useState("");
   const [size, setSize] = useState("");
   const [sort, setSort] = useState("newest");
@@ -140,18 +140,20 @@ export default function ProductGrid() {
               max={maxPrice}
               value={minPrice}
               onChange={e => setMinPrice(Number(e.target.value))}
-              className="w-20"
+              className="w-24"
               aria-label="Min price"
+              placeholder="₹0"
             />
             <span>-</span>
             <Input
               type="number"
               min={minPrice}
-              max={200}
+              max={20000}
               value={maxPrice}
               onChange={e => setMaxPrice(Number(e.target.value))}
-              className="w-20"
+              className="w-24"
               aria-label="Max price"
+              placeholder="₹20000"
             />
           </div>
           {/* Color */}

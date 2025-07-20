@@ -88,8 +88,39 @@ export type Database = {
           },
         ]
       }
+      order_tracking_updates: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          location: string | null
+          order_id: string
+          status: string
+          timestamp: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          order_id: string
+          status: string
+          timestamp?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          order_id?: string
+          status?: string
+          timestamp?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
+          actual_delivery: string | null
           billing_address_line1: string | null
           billing_address_line2: string | null
           billing_city: string | null
@@ -98,11 +129,19 @@ export type Database = {
           billing_state: string | null
           created_at: string
           currency: string
+          estimated_delivery: string | null
           id: string
           notes: string | null
           order_number: string
+          refund_amount: number | null
+          return_notes: string | null
+          return_processed_at: string | null
+          return_reason: string | null
+          return_requested_at: string | null
+          return_status: string | null
           shipping_address_line1: string | null
           shipping_address_line2: string | null
+          shipping_carrier: string | null
           shipping_city: string | null
           shipping_country: string | null
           shipping_postal_code: string | null
@@ -110,21 +149,13 @@ export type Database = {
           status: string
           stripe_session_id: string | null
           total_amount: number
+          tracking_number: string | null
+          tracking_url: string | null
           updated_at: string
           user_id: string | null
-          tracking_number: string | null
-          shipping_carrier: string | null
-          tracking_url: string | null
-          estimated_delivery: string | null
-          actual_delivery: string | null
-          return_status: string | null
-          return_reason: string | null
-          return_requested_at: string | null
-          return_processed_at: string | null
-          refund_amount: number | null
-          return_notes: string | null
         }
         Insert: {
+          actual_delivery?: string | null
           billing_address_line1?: string | null
           billing_address_line2?: string | null
           billing_city?: string | null
@@ -133,11 +164,19 @@ export type Database = {
           billing_state?: string | null
           created_at?: string
           currency?: string
+          estimated_delivery?: string | null
           id?: string
           notes?: string | null
           order_number?: string
+          refund_amount?: number | null
+          return_notes?: string | null
+          return_processed_at?: string | null
+          return_reason?: string | null
+          return_requested_at?: string | null
+          return_status?: string | null
           shipping_address_line1?: string | null
           shipping_address_line2?: string | null
+          shipping_carrier?: string | null
           shipping_city?: string | null
           shipping_country?: string | null
           shipping_postal_code?: string | null
@@ -145,21 +184,13 @@ export type Database = {
           status?: string
           stripe_session_id?: string | null
           total_amount: number
+          tracking_number?: string | null
+          tracking_url?: string | null
           updated_at?: string
           user_id?: string | null
-          tracking_number?: string | null
-          shipping_carrier?: string | null
-          tracking_url?: string | null
-          estimated_delivery?: string | null
-          actual_delivery?: string | null
-          return_status?: string | null
-          return_reason?: string | null
-          return_requested_at?: string | null
-          return_processed_at?: string | null
-          refund_amount?: number | null
-          return_notes?: string | null
         }
         Update: {
+          actual_delivery?: string | null
           billing_address_line1?: string | null
           billing_address_line2?: string | null
           billing_city?: string | null
@@ -168,11 +199,19 @@ export type Database = {
           billing_state?: string | null
           created_at?: string
           currency?: string
+          estimated_delivery?: string | null
           id?: string
           notes?: string | null
           order_number?: string
+          refund_amount?: number | null
+          return_notes?: string | null
+          return_processed_at?: string | null
+          return_reason?: string | null
+          return_requested_at?: string | null
+          return_status?: string | null
           shipping_address_line1?: string | null
           shipping_address_line2?: string | null
+          shipping_carrier?: string | null
           shipping_city?: string | null
           shipping_country?: string | null
           shipping_postal_code?: string | null
@@ -180,59 +219,12 @@ export type Database = {
           status?: string
           stripe_session_id?: string | null
           total_amount?: number
+          tracking_number?: string | null
+          tracking_url?: string | null
           updated_at?: string
           user_id?: string | null
-          tracking_number?: string | null
-          shipping_carrier?: string | null
-          tracking_url?: string | null
-          estimated_delivery?: string | null
-          actual_delivery?: string | null
-          return_status?: string | null
-          return_reason?: string | null
-          return_requested_at?: string | null
-          return_processed_at?: string | null
-          refund_amount?: number | null
-          return_notes?: string | null
         }
         Relationships: []
-      }
-      order_tracking_updates: {
-        Row: {
-          id: string
-          order_id: string
-          status: string
-          location: string | null
-          description: string | null
-          timestamp: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          order_id: string
-          status: string
-          location?: string | null
-          description?: string | null
-          timestamp?: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          order_id?: string
-          status?: string
-          location?: string | null
-          description?: string | null
-          timestamp?: string
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "order_tracking_updates_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       profiles: {
         Row: {

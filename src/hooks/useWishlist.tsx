@@ -46,7 +46,7 @@ export const WishlistProvider: FC<{ children: ReactNode }> = ({ children }) => {
     if (user) {
       const { error } = await supabase.from("wishlist_items").upsert(
         { user_id: user.id, product_id: productId },
-        { onConflict: ["user_id", "product_id"] }
+        { onConflict: "user_id,product_id" }
       );
       if (error) {
         toast({ title: "Error", description: "Failed to add to wishlist.", variant: "destructive" });
@@ -81,7 +81,7 @@ export const WishlistProvider: FC<{ children: ReactNode }> = ({ children }) => {
           for (const productId of ids) {
             await supabase.from("wishlist_items").upsert(
               { user_id: user.id, product_id: productId },
-              { onConflict: ["user_id", "product_id"] }
+              { onConflict: "user_id,product_id" }
             );
           }
         }
