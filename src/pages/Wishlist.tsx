@@ -11,6 +11,7 @@ import { Heart, ShoppingBag, Trash2 } from "lucide-react";
 import productSweater from "@/assets/product-sweater.jpg";
 import productTee from "@/assets/product-tee.jpg";
 import productBlazer from "@/assets/product-blazer.jpg";
+import { useWishlist } from "@/hooks/useWishlist";
 
 // Mock product data - in a real app this would come from your products database
 const mockProducts: Record<string, { name: string; price: number; image: string; category: string }> = {
@@ -22,74 +23,11 @@ const mockProducts: Record<string, { name: string; price: number; image: string;
   "6": { name: "Silk Midi Dress", price: 245.00, image: productBlazer, category: "Dresses" },
 };
 
-interface WishlistItem {
-  id: string;
-  product_id: string;
-  created_at: string;
-}
-
 const Wishlist = () => {
   const { user, loading } = useAuth();
+  const { wishlist, removeFromWishlist, loading: wishlistLoading } = useWishlist();
   const { toast } = useToast();
-  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
-
-  useEffect(() => {
-    if (user) {
-      fetchWishlistItems();
-    }
-  }, [user]);
-
-  const fetchWishlistItems = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("wishlist_items")
-        .select("*")
-        .eq("user_id", user?.id)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-
-      setWishlistItems(data || []);
-    } catch (error) {
-      console.error("Error fetching wishlist items:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load wishlist items.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const removeFromWishlist = async (itemId: string) => {
-    setIsUpdating(true);
-    try {
-      const { error } = await supabase
-        .from("wishlist_items")
-        .delete()
-        .eq("id", itemId);
-
-      if (error) throw error;
-
-      setWishlistItems(prev => prev.filter(item => item.id !== itemId));
-      toast({
-        title: "Success",
-        description: "Item removed from wishlist.",
-      });
-    } catch (error) {
-      console.error("Error removing from wishlist:", error);
-      toast({
-        title: "Error",
-        description: "Failed to remove item from wishlist.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsUpdating(false);
-    }
-  };
 
   const addToCart = async (productId: string) => {
     if (!user) return;
@@ -130,7 +68,7 @@ const Wishlist = () => {
     }
   };
 
-  if (loading || isLoading) {
+  if (loading || wishlistLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl mx-auto p-8">
@@ -146,7 +84,7 @@ const Wishlist = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  if (wishlistItems.length === 0) {
+  if (wishlist.length === 0) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
         <Heart className="w-16 h-16 mb-6 text-muted-foreground" />
@@ -165,12 +103,12 @@ const Wishlist = () => {
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold mb-8 text-foreground">My Wishlist</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {wishlistItems.map((item) => {
-            const product = mockProducts[item.product_id];
+          {wishlist.map((productId) => {
+            const product = mockProducts[productId];
             if (!product) return null;
 
             return (
-              <Card key={item.id} className="group overflow-hidden">
+              <Card key={productId} className="group overflow-hidden">
                 <div className="relative aspect-[3/4] overflow-hidden">
                   <img
                     src={product.image}
@@ -181,7 +119,7 @@ const Wishlist = () => {
                     variant="ghost"
                     size="icon"
                     className="absolute top-3 right-3 bg-background/80 hover:bg-background"
-                    onClick={() => removeFromWishlist(item.id)}
+                    onClick={() => removeFromWishlist(productId)}
                     disabled={isUpdating}
                     aria-label="Remove from wishlist"
                   >
@@ -198,14 +136,14 @@ const Wishlist = () => {
                     <Button
                       variant="sage"
                       className="flex-1"
-                      onClick={() => addToCart(item.product_id)}
+                      onClick={() => addToCart(productId)}
                       disabled={isUpdating}
                     >
                       <ShoppingBag className="h-4 w-4 mr-2" />
                       Add to Cart
                     </Button>
                     <Button asChild variant="outline">
-                      <Link to={`/product/${item.product_id}`}>View</Link>
+                      <Link to={`/product/${productId}`}>View</Link>
                     </Button>
                   </div>
                 </CardContent>

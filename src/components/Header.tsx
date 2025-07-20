@@ -32,15 +32,9 @@ export const Header = () => {
       <div className="container mx-auto px-4 lg:px-6 flex h-16 items-center justify-between">
         {/* Logo */}
         <div className="flex items-center">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Sachi</h1>
+          <Link to="/" className="text-2xl font-bold tracking-tight text-foreground">Sachi</Link>
         </div>
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
-          <a href="#" className="text-foreground hover:text-foreground/80 transition-colors">Shop</a>
-          <a href="#" className="text-foreground hover:text-foreground/80 transition-colors">Collections</a>
-          <a href="#" className="text-foreground hover:text-foreground/80 transition-colors">About</a>
-          <a href="#" className="text-foreground hover:text-foreground/80 transition-colors">Contact</a>
-        </nav>
+        
         {/* Centered Search Bar (Desktop) */}
         <div className="hidden md:flex flex-1 justify-center">
           <Button variant="outline" size="sm" className="w-80 justify-start" aria-label="Open search" onClick={() => setIsSearchOpen(true)}>
@@ -121,7 +115,7 @@ export const Header = () => {
         <SheetContent side="left" className="p-0 w-80 max-w-full">
           <div className="flex flex-col h-full">
             <div className="flex items-center justify-between px-4 py-4 border-b border-border">
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">Sachi</h1>
+              <Link to="/" className="text-2xl font-bold tracking-tight text-foreground">Sachi</Link>
               <Switch
                 checked={theme === "dark"}
                 onCheckedChange={v => setTheme(v ? "dark" : "light")}
@@ -129,10 +123,10 @@ export const Header = () => {
               />
             </div>
             <nav className="flex flex-col gap-2 px-4 py-4">
-              <a href="#" className="text-foreground py-2 px-2 rounded hover:bg-accent transition-colors">Shop</a>
-              <a href="#" className="text-foreground py-2 px-2 rounded hover:bg-accent transition-colors">Collections</a>
-              <a href="#" className="text-foreground py-2 px-2 rounded hover:bg-accent transition-colors">About</a>
-              <a href="#" className="text-foreground py-2 px-2 rounded hover:bg-accent transition-colors">Contact</a>
+              <Link to="/shop" className="text-foreground py-2 px-2 rounded hover:bg-accent transition-colors">Shop</Link>
+              <Link to="/collections" className="text-foreground py-2 px-2 rounded hover:bg-accent transition-colors">Collections</Link>
+              <Link to="/about" className="text-foreground py-2 px-2 rounded hover:bg-accent transition-colors">About Us</Link>
+              <Link to="/contact" className="text-foreground py-2 px-2 rounded hover:bg-accent transition-colors">Contact</Link>
             </nav>
             <div className="flex-1" />
             <div className="flex flex-col gap-2 px-4 pb-4">

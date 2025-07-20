@@ -112,6 +112,17 @@ export type Database = {
           total_amount: number
           updated_at: string
           user_id: string | null
+          tracking_number: string | null
+          shipping_carrier: string | null
+          tracking_url: string | null
+          estimated_delivery: string | null
+          actual_delivery: string | null
+          return_status: string | null
+          return_reason: string | null
+          return_requested_at: string | null
+          return_processed_at: string | null
+          refund_amount: number | null
+          return_notes: string | null
         }
         Insert: {
           billing_address_line1?: string | null
@@ -136,6 +147,17 @@ export type Database = {
           total_amount: number
           updated_at?: string
           user_id?: string | null
+          tracking_number?: string | null
+          shipping_carrier?: string | null
+          tracking_url?: string | null
+          estimated_delivery?: string | null
+          actual_delivery?: string | null
+          return_status?: string | null
+          return_reason?: string | null
+          return_requested_at?: string | null
+          return_processed_at?: string | null
+          refund_amount?: number | null
+          return_notes?: string | null
         }
         Update: {
           billing_address_line1?: string | null
@@ -160,8 +182,57 @@ export type Database = {
           total_amount?: number
           updated_at?: string
           user_id?: string | null
+          tracking_number?: string | null
+          shipping_carrier?: string | null
+          tracking_url?: string | null
+          estimated_delivery?: string | null
+          actual_delivery?: string | null
+          return_status?: string | null
+          return_reason?: string | null
+          return_requested_at?: string | null
+          return_processed_at?: string | null
+          refund_amount?: number | null
+          return_notes?: string | null
         }
         Relationships: []
+      }
+      order_tracking_updates: {
+        Row: {
+          id: string
+          order_id: string
+          status: string
+          location: string | null
+          description: string | null
+          timestamp: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          order_id: string
+          status: string
+          location?: string | null
+          description?: string | null
+          timestamp?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          order_id?: string
+          status?: string
+          location?: string | null
+          description?: string | null
+          timestamp?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_tracking_updates_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

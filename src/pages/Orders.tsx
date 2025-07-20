@@ -9,10 +9,12 @@ import { useToast } from "@/hooks/use-toast";
 import { Navigate, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Package, Clock, Truck, CheckCircle, XCircle } from "lucide-react";
+import OrderTracking from "@/components/OrderTracking";
+import { Package, Clock, Truck, CheckCircle, XCircle, Eye } from "lucide-react";
 import productSweater from "@/assets/product-sweater.jpg";
 import productTee from "@/assets/product-tee.jpg";
 import productBlazer from "@/assets/product-blazer.jpg";
+import type { Tables } from "@/integrations/supabase/types";
 
 const productImages: Record<string, string> = {
   "Minimalist Wool Sweater": productSweater,
@@ -23,33 +25,16 @@ const productImages: Record<string, string> = {
   "Silk Midi Dress": productBlazer,
 };
 
-interface OrderItem {
-  id: string;
-  product_name: string;
-  product_description: string;
-  quantity: number;
-  unit_price: number;
-  total_price: number;
-}
-
-interface Order {
-  id: string;
-  order_number: string;
-  status: string;
-  total_amount: number;
-  currency: string;
-  shipping_address_line1: string;
-  shipping_city: string;
-  shipping_state: string;
-  created_at: string;
-  order_items: OrderItem[];
-}
+type Order = Tables<"orders"> & {
+  order_items: Tables<"order_items">[];
+};
 
 const Orders = () => {
   const { user, loading } = useAuth();
   const { toast } = useToast();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -175,7 +160,25 @@ const Orders = () => {
                     <span className="font-semibold text-lg text-foreground">Order #{order.order_number}</span>
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(order.status)}`}>{order.status}</span>
                   </div>
-                  <span className="text-sm text-muted-foreground">{formatDate(order.created_at)}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">{formatDate(order.created_at)}</span>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        {expandedOrder === order.id ? "Hide" : "Quick View"}
+                      </Button>
+                      <Button variant="outline" size="sm" asChild>
+                        <Link to={`/orders/${order.id}`}>
+                          <Eye className="h-4 w-4 mr-1" />
+                          Full Details
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
                 </div>
                 <Separator className="mb-4" />
                 <div className="flex flex-col gap-4">
@@ -195,6 +198,13 @@ const Orders = () => {
                   <span className="text-sm text-muted-foreground">Total</span>
                   <span className="font-bold text-lg text-foreground">{formatPrice(order.total_amount)}</span>
                 </div>
+                
+                {/* Tracking and Return Details */}
+                {expandedOrder === order.id && (
+                  <div className="mt-6 pt-6 border-t">
+                    <OrderTracking order={order} />
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}
