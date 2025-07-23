@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, Search, User, Menu, LogOut, Heart } from "lucide-react";
+import { ShoppingBag, Search, User, Menu, LogOut, Heart, Settings } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdminRole } from "@/hooks/useAdminRole";
 import { Link } from "react-router-dom";
 import {
   DropdownMenu,
@@ -18,6 +19,7 @@ export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const { isAdmin } = useAdminRole();
   const { theme, setTheme } = useTheme();
 
   // Demo search results
@@ -72,6 +74,13 @@ export const Header = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/wishlist">My Wishlist</Link>
                 </DropdownMenuItem>
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin">
+                      <Settings className="mr-2 h-4 w-4" />Admin Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={signOut} aria-label="Sign out">
                   <LogOut className="mr-2 h-4 w-4" />Sign Out
                 </DropdownMenuItem>
